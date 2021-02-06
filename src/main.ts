@@ -1,10 +1,17 @@
 import { NestFactory } from '@nestjs/core';
-import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { ValidationPipe } from '@nestjs/common';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices'; // TODO
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule);
+  app.enableCors();
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   // const app = await NestFactory.createMicroservice<MicroserviceOptions>(
   //   AppModule,
   //   {
@@ -15,7 +22,9 @@ async function bootstrap() {
   //     }
   //   },
   // );
-  
-  app.listen(port, () => console.log('Auth Service is listening on port', port));
+
+  app.listen(port, () =>
+    console.log('Auth Service is listening on port', port),
+  );
 }
 bootstrap();
