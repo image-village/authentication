@@ -1,5 +1,5 @@
 import { IsString, IsEmail, MinLength } from 'class-validator'
-export class User {
+export class UserDto {
   @IsEmail({}, {
     message: "Invalid email"
   })

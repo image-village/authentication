@@ -8,7 +8,7 @@ import {
   HttpException,
   HttpStatus
 } from '@nestjs/common';
-import { User } from './users.dto'
+import { UserDto } from './users.dto'
 // import { MessagePattern } from '@nestjs/microservices';
 import { UsersService } from './users.service'
 
@@ -31,7 +31,7 @@ export class UsersController {
   }
 
   @Post('/signup')
-  public signUp(@Body() user: User): string {
+  public signUp(@Body() user: UserDto): string {
 
     // throw new HttpException('Error connecting to DB', HttpStatus.BAD_REQUEST);
     return 'Hi there user signup';
