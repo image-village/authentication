@@ -26,7 +26,8 @@ async function bootstrap() {
   // );
 
   app.listen(port, () =>
-    console.log('Auth Service is listening on port', port),
+    console.log(`Connected to MongoDB 
+Auth Service is listening on port ${port}`),
   );
 }
 bootstrap();
