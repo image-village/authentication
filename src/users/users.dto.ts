@@ -1,11 +1,13 @@
-import { IsString, IsEmail, Length, MinLength } from 'class-validator'
+import { IsString, IsEmail, MinLength } from 'class-validator'
 export class User {
-  @IsEmail()
+  @IsEmail({}, {
+    message: "Invalid email"
+  })
   email: string;
 
   @IsString()
   @MinLength(6, {
-    message: 'Password is too short',
+    message: 'Password needs to be at least 6 characters',
   })
   password: string;
 }

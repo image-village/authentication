@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices'; // TODO
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './app.exceptions';
 
 async function bootstrap() {
   const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -12,6 +13,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
+   app.useGlobalFilters(new AllExceptionsFilter());
   // const app = await NestFactory.createMicroservice<MicroserviceOptions>(
   //   AppModule,
   //   {

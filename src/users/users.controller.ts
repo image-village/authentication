@@ -5,6 +5,8 @@ import {
   Body,
   Header,
   ValidationPipe,
+  HttpException,
+  HttpStatus
 } from '@nestjs/common';
 import { User } from './users.dto'
 // import { MessagePattern } from '@nestjs/microservices';
@@ -29,9 +31,9 @@ export class UsersController {
   }
 
   @Post('/signup')
-  // @Header('content-type', 'application/json')
   public signUp(@Body() user: User): string {
-    console.log(user);
+
+    // throw new HttpException('Error connecting to DB', HttpStatus.BAD_REQUEST);
     return 'Hi there user signup';
   }
 }
