@@ -50,7 +50,7 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    // Clean by after rtests by closing app and db connection
+    // Clean by after tests by closing app and db connection
     try {
       await mongo.stop();
       await app.close();

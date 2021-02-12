@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ObjectID, Repository } from 'typeorm';
 import { User } from './users.entity';
 import { Utils } from './users.utils';
 import { EMAIL_ALREADY_IN_USE, INVALID_CREDENTIALS } from './users.interface';
@@ -13,6 +13,7 @@ import { EMAIL_ALREADY_IN_USE, INVALID_CREDENTIALS } from './users.interface';
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private utils: Utils
   ) {}
 
   async createUser(user: User): Promise<User> {
@@ -31,6 +32,7 @@ export class UsersService {
 
   async findUser(user: User): Promise<User> {
     const { email, password } = user;
+
     const existingUser = await this.usersRepository.findOne({
       email,
     });
@@ -39,7 +41,7 @@ export class UsersService {
       throw new BadRequestException(INVALID_CREDENTIALS);
     }
 
-    const passwordIsValid = await Utils.comparePassword(
+    const passwordIsValid = await this.utils.comparePassword(
       existingUser.password,
       password,
     );
@@ -50,8 +52,4 @@ export class UsersService {
 
     return existingUser;
   }
-
-  // async findAllUsers(): Promise<User[]> {
-  //   return this.userModel.find().exec();
-  // }
 }
