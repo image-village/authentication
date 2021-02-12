@@ -34,9 +34,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const messageBody =
-      exception instanceof HttpException
-        ? getHttpErrorMsg()
-        : ['Internal Server Error'];
+      exception instanceof HttpException ? getHttpErrorMsg() : ['Internal Server Error'];
 
     response.status(status).json({
       statusCode: status,
