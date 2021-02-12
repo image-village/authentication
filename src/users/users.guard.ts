@@ -1,11 +1,37 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { UserPayload } from './users.interface';
+import { Utils } from './users.utils';
 
+declare global {
+  namespace Express {
+    interface Request {
+      currentUser?: UserPayload;
+    }
+  }
+}
 @Injectable()
-export class UsersGuard implements CanActivate {
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    return true;
+export class AuthGuard implements CanActivate {
+  constructor(private utils: Utils){}
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest() as Request;
+    const authorization = request.session?.jwt;
+
+    if (!authorization) {
+      throw new UnauthorizedException();
+    }
+
+    try {
+      const payload = this.utils.verifyJwt(authorization) as UserPayload;
+      request.currentUser = payload;
+      return true;
+    } catch (error) {}
+
+    throw new UnauthorizedException();
   }
 }
