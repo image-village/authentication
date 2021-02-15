@@ -84,9 +84,9 @@ describe('AppController (e2e)', () => {
             email: 'test@test',
             password: 'password',
           })
+          .expect(400)
           .expect({
-            statusCode: 400,
-            message: ['Invalid email'],
+            errors: [{ message: 'Invalid email' }], 
           });
       });
 
@@ -97,9 +97,9 @@ describe('AppController (e2e)', () => {
             email: 'test@test.ca',
             password: 'pa',
           })
+          .expect(400)
           .expect({
-            statusCode: 400,
-            message: ['Password needs to be at least 6 characters'],
+            errors: [{ message: 'Password needs to be at least 6 characters' }],
           });
       });
 
@@ -107,11 +107,11 @@ describe('AppController (e2e)', () => {
         return await request(app.getHttpServer())
           .post('/users/signup')
           .send({})
+          .expect(400)
           .expect({
-            statusCode: 400,
-            message: [
-              'Invalid email',
-              'Password needs to be at least 6 characters',
+            errors: [
+              { message: 'Invalid email' },
+              { message: 'Password needs to be at least 6 characters' },
             ],
           });
       });
@@ -130,10 +130,8 @@ describe('AppController (e2e)', () => {
             email: 'test@test.com',
             password: 'password',
           })
-          .expect({
-            statusCode: 409,
-            message: ['Email already in use'],
-          });
+          .expect(409)
+          .expect({ errors: [{ message: 'Email already in use' }] });
       });
 
       it('should set a cookie after successful signup', async () => {
@@ -177,10 +175,8 @@ describe('AppController (e2e)', () => {
             email: 'test123@test.com',
             password: 'password',
           })
-          .expect({
-            statusCode: 400,
-            message: ['Invalid credentials'],
-          });
+          .expect(400)
+          .expect({ errors: [{ message: 'Invalid credentials' }] });
       });
 
       it('should throw an error when signing with the wrong password', async () => {
@@ -198,10 +194,8 @@ describe('AppController (e2e)', () => {
             email: 'test123@test.com',
             password: 'password12345',
           })
-          .expect({
-            statusCode: 400,
-            message: ['Invalid credentials'],
-          });
+          .expect(400)
+          .expect({ errors: [{ message: 'Invalid credentials' }] });
       });
     });
 
@@ -233,13 +227,11 @@ describe('AppController (e2e)', () => {
         expect(response.body.currentUser.email).toEqual('test@test.com');
       });
       it('should return error if current user is not authenticated', async () => {
-        const response = await request(app.getHttpServer())
+        await request(app.getHttpServer())
           .get('/users/currentuser')
           .send()
-          .expect({
-            statusCode: 401,
-            message: ['Unauthorized'],
-          });
+          .expect(401)
+          .expect({ errors: [{ message: 'Unauthorized' }] });
       });
     });
   });
