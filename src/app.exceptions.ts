@@ -6,39 +6,66 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
+interface ErrorObject {
+  message: string;
+}
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
+    const errors: ErrorObject[] = [];
+    let statusCode = 0;
 
-    const getHttpErrorMsg = (): string[] => {
-      // Only process Http Exceptions
-      if (!(exception instanceof HttpException)) return;
+    const errorProcessor = () => {
+      /**
+       * * Handle server errors
+       */
+      if (!(exception instanceof HttpException)) {
+        (statusCode = HttpStatus.INTERNAL_SERVER_ERROR),
+          errors.push({
+            message: 'Internal Server Error',
+          });
+        return;
+      }
 
+      statusCode = exception.getStatus();
+      /**
+       * * Handle generic errors
+       */
+      if (statusCode === 404) {
+        errors.push({
+          message: 'Not Found',
+        });
+        return;
+      } else if (statusCode === 401) {
+        errors.push({
+          message: 'Unauthorized',
+        });
+        return;
+      }
+      /**
+       * * Handle application context errors
+       */
       const errorResponse = exception.getResponse();
-      // if http error response is a string, return an array or error message string
-      // else if, its an object, check that the message property is an Array
-      // and if so, return the message property otherwise return an Array of the message
       if (typeof errorResponse === 'string') {
-        return [errorResponse];
+        errors.push({
+          message: errorResponse,
+        });
       } else if (typeof errorResponse === 'object') {
-        let msg = errorResponse as Error;
-        return Array.isArray(msg.message) ? msg.message : [msg.message];
+        let msg = errorResponse as ErrorObject;
+        if (Array.isArray(msg.message)) {
+          for (let err of msg.message) {
+            errors.push({
+              message: err,
+            });
+          }
+        }
       }
     };
 
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    errorProcessor();
 
-    const messageBody =
-      exception instanceof HttpException ? getHttpErrorMsg() : ['Internal Server Error'];
-
-    response.status(status).json({
-      statusCode: status,
-      message: messageBody,
-    });
+    response.status(statusCode).json({ errors });
   }
 }

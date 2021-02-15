@@ -8,8 +8,6 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
-  Delete,
-  Param,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { Utils } from './users.utils';
@@ -33,13 +31,21 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('/currentuser')
   currentUser(@Res() res: Response, @Req() req: Request) {
-    res.send({ currentUser: req.currentUser });
+    try {
+      res.send({ currentUser: req.currentUser });
+    } catch (error) {
+      throw new Error()
+    }
   }
 
   @Post('/signout')
   signOut(@Res() res: Response, @Req() req: Request) {
-    req.session = null;
-    res.status(HttpStatus.OK).send({});
+    try {      
+      req.session = null;
+      res.status(HttpStatus.OK).send({});
+    } catch (error) {
+      throw new Error()
+    }
   }
 
   @Post('/signin')
@@ -59,7 +65,7 @@ export class UsersController {
       if (error.message === INVALID_CREDENTIALS) {
         throw new HttpException(error.message, error.status);
       } else {
-        throw new Error(error.message);
+        throw new Error();
       }
     }
   }
@@ -90,8 +96,6 @@ export class UsersController {
     } catch (error) {
       if (error.message === EMAIL_ALREADY_IN_USE) {
         throw new HttpException(EMAIL_ALREADY_IN_USE, HttpStatus.CONFLICT);
-      } else if (!user) {
-        throw new HttpException(USER_NOT_CREATED, HttpStatus.BAD_REQUEST);
       } else {
         throw new Error();
       }
