@@ -23,7 +23,8 @@ export class AuthGuard implements CanActivate {
     const authorization = request.session?.jwt;
 
     if (!authorization) {
-      throw new UnauthorizedException();
+      request.currentUser = null;
+      return true;
     }
 
     try {

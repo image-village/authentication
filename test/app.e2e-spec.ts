@@ -86,7 +86,7 @@ describe('AppController (e2e)', () => {
           })
           .expect(400)
           .expect({
-            errors: [{ message: 'Invalid email' }], 
+            errors: [{ message: 'Invalid email' }],
           });
       });
 
@@ -226,12 +226,15 @@ describe('AppController (e2e)', () => {
 
         expect(response.body.currentUser.email).toEqual('test@test.com');
       });
-      it('should return error if current user is not authenticated', async () => {
+
+      it('should return null if current user is not authenticated', async () => {
         await request(app.getHttpServer())
           .get('/users/currentuser')
           .send()
-          .expect(401)
-          .expect({ errors: [{ message: 'Unauthorized' }] });
+          .expect({
+            currentUser: null,
+          })
+          
       });
     });
   });
